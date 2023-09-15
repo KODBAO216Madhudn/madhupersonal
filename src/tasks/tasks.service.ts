@@ -41,9 +41,8 @@ export class TasksService {
   // }
   async getAllTasks(filterDto : GetTasksFilterDto = { }): Promise<Task[]> {
     const {search, status}  = filterDto;
-    console.log("search ",filterDto)
 
-    
+    console.log("filterDto ",filterDto)
     const query = this.taskRepository.createQueryBuilder('task');
 
     if(status){
@@ -51,7 +50,7 @@ export class TasksService {
     }
     if(search){
       query.andWhere('LOWER(task.title) LIKE LOWER(:search) OR LOWER(task.description) LIKE LOWER(:search)',
-      { search :`%search%`,
+      { search :`%${search}%`,
     })
     }
 
@@ -64,10 +63,13 @@ export class TasksService {
     const task = this.taskRepository.create({
       title,
       description,
+      finishedBy,
       status: TaskStatus.OPEN,
     });
-    this.taskRepository.save(task);
-    return task;
+
+    const saveTask= await this.taskRepository.save(task);
+
+    return saveTask;
   }
 
     async deleteTasksById(id: string): Promise<void> {

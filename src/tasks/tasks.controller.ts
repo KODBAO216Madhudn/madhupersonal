@@ -29,7 +29,7 @@ export class TasksController {
   //   return this.tasksService.getAllTasks(filterDto);
   // }
   @Get()
-  getAllTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
+  getAllTasks(@Query() filterDto: GetTasksFilterDto): Promise<Task[]> {
     return this.tasksService.getAllTasks(filterDto);
   }
   
@@ -69,7 +69,7 @@ export class TasksController {
     return this.tasksService.createTasks(createTaskDto);
   }
 
-  @Patch('/:id/status')
+  @Patch('/:id')
   updateTask(
     // @Body('title') title: string,
     // @Body('description') description: string,

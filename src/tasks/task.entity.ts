@@ -13,5 +13,8 @@ export class Task {
   description: string;
 
   @Column()
+  finishedBy: string;
+
+  @Column()
   status: TaskStatus;
 }
