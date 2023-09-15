@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -7,6 +8,8 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { TaskStatus } from './task-status.enum';
@@ -14,50 +17,34 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { Task } from './task.entity';
+import {AuthGuard} from "@nestjs/passport"
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/auth/auth.entity';
+import { ConfigModule } from '@nestjs/config';
+
 
 @Controller('tasks')
+@UseGuards(AuthGuard())
+// @UseInterceptors(ClassSerializerInterceptor)
 export class TasksController {
-  constructor(private tasksService: TasksService) {}
+  constructor(private tasksService: TasksService,
+    private configModule: ConfigModule) {
+      
+    }
 
   @Get('/:id')
-  getTaskById(@Param('id') id: string): Promise<Task> {
-    return this.tasksService.getTaskById(id);
+  getTaskById(@Param('id') id: string, @GetUser() user: User,): Promise<Task> {
+    return this.tasksService.getTaskById(id, user);
   }
 
-  // @Get()
-  // getAllTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
-  //   return this.tasksService.getAllTasks(filterDto);
-  // }
   @Get()
-  getAllTasks(@Query() filterDto: GetTasksFilterDto): Promise<Task[]> {
-    return this.tasksService.getAllTasks(filterDto);
+  getAllTasks(@Query() filterDto: GetTasksFilterDto, @GetUser() user: User,): Promise<Task[]> {
+    return this.tasksService.getAllTasks(filterDto, user);
   }
   
-  // @Get()
-  // getAllTasks(): Task[] {
-  //   return this.tasksService.getAllTasks();
-  // }
-
-  // @Get()
-  // getTasks(@Query() filterDto: GetTasksFilterDto): Task[] {
-  //   // if we have any filters defined, call tasksService.getTasksWilFilters
-  //   // otherwise, just get all tasks
-  //   if (Object.keys(filterDto).length) {
-  //     // ...
-  //     return this.tasksService.getTasksWithFilter(filterDto);
-  //   } else {
-  //     return this.tasksService.getAllTasks();
-  //   }
-  // }
-
-  // @Get('/:id')
-  // getTasksById(@Param('id') id: string): Task {
-  //   return this.tasksService.getTasksById(id);
-  // }
-
   @Delete('/:id')
-  deleteTasksById(@Param('id') id: string): Promise<void> {
-    return this.tasksService.deleteTasksById(id);
+  deleteTasksById(@Param('id') id: string, @GetUser() user: User,): Promise<void> {
+    return this.tasksService.deleteTasksById(id, user);
   }
 
   @Post()
@@ -65,8 +52,9 @@ export class TasksController {
     // @Body('title') title: string,
     // @Body('description') description: string,
     @Body() createTaskDto: CreateTaskDto,
+    @GetUser() user: User,
   ): Promise<Task> {
-    return this.tasksService.createTasks(createTaskDto);
+    return this.tasksService.createTasks(createTaskDto, user);
   }
 
   @Patch('/:id')
@@ -75,8 +63,9 @@ export class TasksController {
     // @Body('description') description: string,
     @Param('id') id: string,
     @Body() updateTaskStatusDto: UpdateTaskStatusDto,
+    @GetUser() user: User,
   ): Promise<Task> {
     const { status } = updateTaskStatusDto;
-    return this.tasksService.updateTasks(id, status);
+    return this.tasksService.updateTasks(id, status, user);
   }
 }

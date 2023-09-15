@@ -5,21 +5,46 @@ import { TasksModule } from './tasks/tasks.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Task } from './tasks/task.entity';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+// ----------------------------------------------------------------------------------
 @Module({
   imports: [
-    TasksModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'postgres',
-      database: 'task-management',
-      // entities:[Task, Auth],
-      autoLoadEntities: true,
-      synchronize: true,
-      logging: true,
+    ConfigModule.forRoot({
+      envFilePath: [`env.stage.${process.env.STAGE}`]
     }),
+    TasksModule,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async(configService: ConfigService)=>{
+        return{
+          type:'postgres',
+          host: configService.get('DB_HOST'),
+          port: configService.get('DB_PORT'),
+          username: configService.get('DB_NAME'),
+          password: configService.get('DB_PASS'),
+          database: configService.get('DB_DATABASE'),
+              //   // entities:[Task, Auth],
+          autoLoadEntities: true,
+          synchronize: true,
+          logging: true,
+        }
+      },
+    }),
+
+    // TypeOrmModule.forRoot({
+    //   type: 'postgres',
+    //   host: 'localhost',
+    //   port: 5432,
+    //   username: 'postgres',
+    //   password: 'postgres',
+    //   database: 'task-management',
+    //   // entities:[Task, Auth],
+    //   autoLoadEntities: true,
+    //   synchronize: true,
+    //   logging: true,
+    // }),
     AuthModule,
   ],
   controllers: [AppController],
