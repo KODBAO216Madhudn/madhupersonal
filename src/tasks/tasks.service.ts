@@ -10,7 +10,7 @@ import { Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { TaskStatus } from './task-status.enum';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
-import { User } from 'src/auth/auth.entity';
+import { User } from '../auth/auth.entity';
 import { Logger } from '@nestjs/common';
 
 @Injectable()

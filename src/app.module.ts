@@ -6,12 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Task } from './tasks/task.entity';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { configValidationSchema } from './config.schema';
 
 // ----------------------------------------------------------------------------------
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`env.stage.${process.env.STAGE}`]
+      envFilePath: [`.env.stage.${process.env.STAGE}`],
+      validationSchema: configValidationSchema,
     }),
     TasksModule,
     TypeOrmModule.forRootAsync({
@@ -19,11 +21,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: async(configService: ConfigService)=>{
         return{
-          type:'postgres',
+          type: 'postgres',
           host: configService.get('DB_HOST'),
           port: configService.get('DB_PORT'),
           username: configService.get('DB_NAME'),
-          password: configService.get('DB_PASS'),
+          // password: configService.get('DB_PASS'),
+               password: configService.get('DB_PASS'),
           database: configService.get('DB_DATABASE'),
               //   // entities:[Task, Auth],
           autoLoadEntities: true,

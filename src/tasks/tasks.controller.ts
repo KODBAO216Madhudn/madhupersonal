@@ -18,17 +18,16 @@ import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { Task } from './task.entity';
 import {AuthGuard} from "@nestjs/passport"
-import { GetUser } from 'src/auth/get-user.decorator';
-import { User } from 'src/auth/auth.entity';
-import { ConfigModule } from '@nestjs/config';
+import { GetUser } from '../auth/get-user.decorator';
+import { User } from '../auth/auth.entity';
 
 
 @Controller('tasks')
 @UseGuards(AuthGuard())
 // @UseInterceptors(ClassSerializerInterceptor)
 export class TasksController {
-  constructor(private tasksService: TasksService,
-    private configModule: ConfigModule) {
+  constructor(private tasksService: TasksService,)
+    {
       
     }
 
